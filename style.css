@@ -18,6 +18,13 @@
     --board-height: calc((var(--cell-size) * 6) + (var(--gap) * 7));
 }
 
+@media (max-width: 600px) {
+    :root {
+        --cell-size: 40px;
+        --gap: 6px;
+    }
+}
+
 * {
     box-sizing: border-box;
     margin: 0;

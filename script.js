@@ -2,8 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration
     const ROWS = 6;
     const COLS = 7;
-    const CELL_SIZE = 60; // Must match CSS
-    const GAP = 10;       // Must match CSS
+    // CELL_SIZE and GAP are now handled via CSS variables
 
     // State
     const state = {
@@ -142,12 +141,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Start position (Spawn outside board)
         // If gravity DOWN, spawn above. If UP, spawn below.
-        const startTop = state.gravity === 1 ? -60 : (ROWS * (CELL_SIZE + GAP)) + 60;
-        const targetTop = calcTop(row);
-        const left = GAP + (col * (CELL_SIZE + GAP));
+        // We use CSS calc to be responsive.
+        // var(--gap) + (col * (var(--cell-size) + var(--gap)))
+        const left = `calc(var(--gap) + ${col} * (var(--cell-size) + var(--gap)))`;
 
-        piece.style.left = `${left}px`;
-        piece.style.top = `${startTop}px`;
+        let startRow;
+        if (state.gravity === 1) {
+            startRow = -1;
+        } else {
+            startRow = ROWS;
+        }
+
+        const startTop = calcTop(startRow);
+        const targetTop = calcTop(row);
+
+        piece.style.left = left;
+        piece.style.top = startTop;
 
         boardEl.appendChild(piece);
 
@@ -160,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // the initial 'top' value before we change it, forcing the transition.
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                piece.style.top = `${targetTop}px`;
+                piece.style.top = targetTop;
             });
         });
 
@@ -319,11 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pieceObj.row = newRow;
         pieceObj.col = col;
         const top = calcTop(newRow);
-        pieceObj.element.style.top = `${top}px`;
+        pieceObj.element.style.top = top;
     }
 
     function calcTop(row) {
-        return GAP + (row * (CELL_SIZE + GAP));
+        return `calc(var(--gap) + ${row} * (var(--cell-size) + var(--gap)))`;
     }
 
     function checkGlobalWin() {
