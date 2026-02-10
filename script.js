@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scores: { 1: 0, 2: 0 },
         gameOver: false,
         isAnimating: false,
-        autoGravity: true
+        autoGravity: true,
+        aiEnabled: false
     };
 
     // DOM Elements
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnResetScore = document.getElementById('btn-reset-score');
     // btnGravity removed
     const btnAutoGravity = document.getElementById('btn-auto-gravity');
+    const btnAiMode = document.getElementById('btn-ai-mode');
     const modal = document.getElementById('modal-game-over');
     const winnerText = document.getElementById('winner-text');
     const btnPlayAgain = document.getElementById('btn-play-again');
@@ -238,6 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateUI();
+
+        if (state.aiEnabled && state.turn === 2 && !state.gameOver) {
+            setTimeout(makeAiMove, 600);
+        }
     }
 
     function toggleGravity(isAuto = false) {
@@ -372,9 +378,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnAutoGravity.addEventListener('click', () => {
             state.autoGravity = !state.autoGravity;
-            btnAutoGravity.textContent = `Auto-Switch-Gravity: ${state.autoGravity ? 'ON' : 'OFF'}`;
-            btnAutoGravity.classList.toggle('warning', !state.autoGravity);
+            btnAutoGravity.textContent = `Auto Switch Gravity: ${state.autoGravity ? 'ON' : 'OFF'}`;
+            btnAutoGravity.classList.toggle('secondary', !state.autoGravity);
             btnAutoGravity.classList.toggle('primary', state.autoGravity);
+        });
+
+        btnAiMode.addEventListener('click', () => {
+            state.aiEnabled = !state.aiEnabled;
+            btnAiMode.textContent = `Play vs AI (Red): ${state.aiEnabled ? 'ON' : 'OFF'}`;
+            btnAiMode.classList.toggle('primary', state.aiEnabled);
+            btnAiMode.classList.toggle('secondary', !state.aiEnabled);
+
+            if (state.aiEnabled && state.turn === 2 && !state.gameOver && !state.isAnimating) {
+                makeAiMove();
+            }
         });
 
         btnPlayAgain.addEventListener('click', resetGame);
@@ -392,6 +409,76 @@ document.addEventListener('DOMContentLoaded', () => {
     function gameLoop() {
         // Optional: Continuous updates if needed
         requestAnimationFrame(gameLoop);
+    }
+
+    function makeAiMove() {
+        if (state.gameOver || state.turn !== 2) return;
+
+        const validMoves = [];
+        for (let c = 0; c < COLS; c++) {
+            if (getAiTargetRow(c) !== -1) {
+                validMoves.push(c);
+            }
+        }
+
+        if (validMoves.length === 0) return;
+
+        let bestMove = -1;
+
+        // 1. Check for immediate win
+        for (const col of validMoves) {
+            const row = getAiTargetRow(col);
+            state.board[row][col] = 2; // Sim AI
+            if (checkWin(row, col, 2)) {
+                bestMove = col;
+            }
+            state.board[row][col] = 0; // Undo
+            if (bestMove !== -1) break;
+        }
+
+        // 2. Block opponent immediate win
+        if (bestMove === -1) {
+            for (const col of validMoves) {
+                const row = getAiTargetRow(col);
+                state.board[row][col] = 1; // Sim Opponent
+                if (checkWin(row, col, 1)) {
+                    bestMove = col;
+                }
+                state.board[row][col] = 0; // Undo
+                if (bestMove !== -1) break;
+            }
+        }
+
+        // 3. Strategic Random (Prefer Center)
+        if (bestMove === -1) {
+            const centerOrder = [3, 2, 4, 1, 5, 0, 6];
+            // Filter only valid moves from centerOrder
+            const validCenterMoves = centerOrder.filter(c => validMoves.includes(c));
+
+            // 20% randomness to avoid being too predictable, or pick first valid center move
+            if (Math.random() < 0.2 && validMoves.length > 0) {
+                bestMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+            } else if (validCenterMoves.length > 0) {
+                bestMove = validCenterMoves[0];
+            } else {
+                bestMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+            }
+        }
+
+        handleColumnClick(bestMove);
+    }
+
+    function getAiTargetRow(col) {
+        if (state.gravity === 1) { // DOWN
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (state.board[r][col] === 0) return r;
+            }
+        } else { // UP
+            for (let r = 0; r < ROWS; r++) {
+                if (state.board[r][col] === 0) return r;
+            }
+        }
+        return -1;
     }
 
     init();
