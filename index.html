@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Connect Four</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Gravity Connect Four</h1>
+            <div class="game-info">
+                <div class="score-board">
+                    <div class="score-card player-yellow active-turn" id="score-yellow">
+                        <span class="player-name">Yellow</span>
+                        <span class="score-value" id="score-val-yellow">0</span>
+                    </div>
+                    <div class="score-card player-red" id="score-red">
+                        <span class="player-name">Red</span>
+                        <span class="score-value" id="score-val-red">0</span>
+                    </div>
+                </div>
+                <div class="gravity-status" id="gravity-status">
+                    Gravity: <span id="gravity-direction">DOWN ▼</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-board-container">
+                <!-- clickable columns for input -->
+                <div class="column-selectors" id="column-selectors"></div>
+
+                <div class="board" id="board">
+                    <!-- Grid cells for visual background -->
+                    <div class="grid-background" id="grid-background"></div>
+                    <!-- Pieces will be injected here absolutely -->
+                </div>
+            </div>
+        </main>
+
+        <div class="controls">
+            <button id="btn-reset" class="btn secondary">Reset Game</button>
+            <button id="btn-auto-gravity" class="btn primary">Auto-Switch-Gravity: ON</button>
+        </div>
+    </div>
+
+    <!-- Modal for Game Over -->
+    <div id="modal-game-over" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="winner-text">Player Wins!</h2>
+            <button id="btn-play-again" class="btn primary">Play Again</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

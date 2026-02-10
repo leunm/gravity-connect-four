@@ -1,0 +1,281 @@
+:root {
+    --bg-color: #1a1a2e;
+    --board-color: #16213e;
+    --board-border: #0f3460;
+    --slot-color: #1a1a2e;
+    /* Matches bg to look like holes */
+    --yellow-piece: #ffcc00;
+    /* Bright Yellow */
+    --red-piece: #e94560;
+    --text-color: #fff;
+    --accent-color: #0f3460;
+    --highlight: #e94560;
+
+
+    --cell-size: 60px;
+    --gap: 10px;
+    --board-width: calc((var(--cell-size) * 7) + (var(--gap) * 8));
+    --board-height: calc((var(--cell-size) * 6) + (var(--gap) * 7));
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 800px;
+    width: 100%;
+}
+
+header {
+    text-align: center;
+    width: 100%;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.highlight {
+    color: var(--highlight);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.score-board {
+    display: flex;
+    gap: 20px;
+}
+
+.score-card {
+    background: var(--board-color);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.score-card.active-turn {
+    border-color: var(--text-color);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.player-name {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.score-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.player-yellow .score-value {
+    color: var(--yellow-piece);
+}
+
+.player-red .score-value {
+    color: var(--red-piece);
+}
+
+.gravity-status {
+    background: var(--accent-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    min-width: 180px;
+    text-align: center;
+}
+
+/* Game Board */
+.game-board-container {
+    position: relative;
+    padding: 20px;
+}
+
+.column-selectors {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    z-index: 10;
+    padding: var(--gap);
+}
+
+.col-trigger {
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0);
+    transition: background 0.2s;
+}
+
+.col-trigger:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.board {
+    width: var(--board-width);
+    height: var(--board-height);
+    background-color: var(--board-color);
+    border: 5px solid var(--board-border);
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    /* We don't use overflow:hidden so pieces can fall in/out if valid, 
+       but typically they stay inside. */
+}
+
+.grid-background {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: var(--gap);
+    padding: var(--gap);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.cell-slot {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--bg-color);
+    /* The "hole" */
+    border-radius: 50%;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.piece {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: 50%;
+    position: absolute;
+    transition: top 0.6s cubic-bezier(0.5, 0, 0.5, 1);
+    z-index: 5;
+    /* Pieces sit BEHIND the grid background if we used an overlay image.
+       But here we are just placing them on top of the board div, 
+       and if we want "holes", we need a mask or SVG. 
+       
+       Simplification for pure CSS/Divs: 
+       The "grid-background" has holes? No, it's easier to just place pieces on top 
+       for this prototype. 
+    */
+    box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.5), 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.piece.yellow {
+    background-color: var(--yellow-piece);
+    border: 2px solid #ccaa00;
+}
+
+.piece.red {
+    background-color: var(--red-piece);
+    border: 2px solid #ff99aa;
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.primary {
+    background-color: var(--highlight);
+    color: white;
+}
+
+.secondary {
+    background-color: #555;
+    color: white;
+}
+
+.warning {
+    background-color: #ffaa00;
+    color: #1a1a2e;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: var(--board-color);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    border: 2px solid var(--highlight);
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
