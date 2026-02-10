@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreRedEl = document.getElementById('score-red');
     const gravityStatus = document.getElementById('gravity-direction');
     const btnReset = document.getElementById('btn-reset');
+    const btnResetScore = document.getElementById('btn-reset-score');
     // btnGravity removed
     const btnAutoGravity = document.getElementById('btn-auto-gravity');
     const modal = document.getElementById('modal-game-over');
@@ -361,6 +362,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners() {
         btnReset.addEventListener('click', resetGame);
+
+        btnResetScore.addEventListener('click', () => {
+            state.scores[1] = 0;
+            state.scores[2] = 0;
+            scoreValYellow.textContent = '0';
+            scoreValRed.textContent = '0';
+        });
 
         btnAutoGravity.addEventListener('click', () => {
             state.autoGravity = !state.autoGravity;
