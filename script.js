@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnResetScore = document.getElementById('btn-reset-score');
     // btnGravity removed
     const btnAutoGravity = document.getElementById('btn-auto-gravity');
-    const btnAiMode = document.getElementById('btn-ai-mode');
+    const aiToggleBtn = document.getElementById('btn-ai-mode');
     const modal = document.getElementById('modal-game-over');
     const winnerText = document.getElementById('winner-text');
     const btnPlayAgain = document.getElementById('btn-play-again');
@@ -383,16 +383,19 @@ document.addEventListener('DOMContentLoaded', () => {
             btnAutoGravity.classList.toggle('primary', state.autoGravity);
         });
 
-        btnAiMode.addEventListener('click', () => {
-            state.aiEnabled = !state.aiEnabled;
-            btnAiMode.textContent = `Play vs AI (Red): ${state.aiEnabled ? 'ON' : 'OFF'}`;
-            btnAiMode.classList.toggle('primary', state.aiEnabled);
-            btnAiMode.classList.toggle('secondary', !state.aiEnabled);
+        if (aiToggleBtn) {
+            aiToggleBtn.addEventListener('click', (e) => {
+                state.aiEnabled = !state.aiEnabled;
+                const btn = e.currentTarget;
+                btn.textContent = `Play vs AI (Red): ${state.aiEnabled ? 'ON' : 'OFF'}`;
+                btn.classList.toggle('primary', state.aiEnabled);
+                btn.classList.toggle('secondary', !state.aiEnabled);
 
-            if (state.aiEnabled && state.turn === 2 && !state.gameOver && !state.isAnimating) {
-                makeAiMove();
-            }
-        });
+                if (state.aiEnabled && state.turn === 2 && !state.gameOver && !state.isAnimating) {
+                    makeAiMove();
+                }
+            });
+        }
 
         btnPlayAgain.addEventListener('click', resetGame);
     }
