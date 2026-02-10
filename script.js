@@ -156,8 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Trigger animation
+        // We use double requestAnimationFrame to ensure the browser has time to register
+        // the initial 'top' value before we change it, forcing the transition.
         requestAnimationFrame(() => {
-            piece.style.top = `${targetTop}px`;
+            requestAnimationFrame(() => {
+                piece.style.top = `${targetTop}px`;
+            });
         });
 
         // Wait for animation to finish before next turn
